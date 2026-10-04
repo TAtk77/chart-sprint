@@ -1,0 +1,11 @@
+patient,max HR,min HR,avg HR,rhythm,IVCD?,AVB?,PSVC count,PVC count,# of morph,SV couplet,ven couplet,v bigeminy,v trigeminy,pt marker count,VT,SVT,misc
+wMkAE5lD,69,41,48,sinus,no,no,16,2,,,,,,,,,
+wOG2lYVw,127,52,74,sinus,no,no,60,2,2,1,,,,,,,
+DY0zQ0Vx,138,48,48,sinus,no,no,8,103,2,,,,,,,,
+wpKj3RBo,95,52,63,sinus,no,no,23,8,2,,,,,,,,
+oNLVbpgx,128,57,71,sinus,no,no,6,1,,,,,,,,,
+wVQ1lJno,141,57,87,sinus,no,no,10,109,,,,,,,,,signal loss day 1 1423-1517
+w3LeJJKx,127,54,75,sinus,no,no,14,0,,,,,,,,,
+xbnRjnPx,129,52,72,sinus,no,no,38,112,2,1,,,,,,,
+o7yl9M3x,138,54,88,sinus,no,no,0,0,,,,,,,,,signal loss day 2 0717 to approx 1100
+DPmLNp6o,105,62,74,sinus,no,no,28,47,,,1,2,,,,1,SV triplet

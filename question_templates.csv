@@ -1,0 +1,17 @@
+field_key,prompt,type,tier,label
+max_hr,What was the maximum HR? ___,numeric_hr,core,
+min_hr,What was the minimum HR? ___,numeric_hr,core,
+avg_hr,What was the average HR? ___,numeric_hr,core,
+rhythm,What was the underlying rhythm? ___,categorical,core,
+psvc_count,How many {label} were there? ___,numeric_count,count_pick,PSVCs
+pvc_count,How many {label} were there? ___,numeric_count,count_pick,PVCs
+svt,How many {label} were there? ___,numeric_count,count_pick,SVTs
+vt,How many {label} were there? ___,numeric_count,count_pick,VTs
+sv_couplet,How many {label} were there? ___,numeric_count,count_pick,SV couplets
+ven_couplet,How many {label} were there? ___,numeric_count,count_pick,ventricular couplets
+v_bigeminy,How many {label} were there? ___,numeric_count,count_pick,instances of v bigeminy
+v_trigeminy,How many {label} were there? ___,numeric_count,count_pick,instances of v trigeminy
+of_morph,How many {label} were there? ___,numeric_count,count_pick,PVC morphologies
+pt_marker_count,How many {label} were there? ___,numeric_count,count_pick,patient markers
+ivcd,Was IVCD present in this study? ___,yesno,extra,
+avb,Was AVB present in this study? ___,yesno,extra,

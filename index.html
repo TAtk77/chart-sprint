@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chart Sprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Lato:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<script>
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("cs_theme"); } catch (e) {}
+    if (!t) t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root {
+    --navy: #1B3A57;
+    --navy-dark: #142A40;
+    --steel: #4A7A96;
+    --steel-light: #7FA6BC;
+    --red: #B23A2E;
+    --red-light: #E7C9C5;
+    --bg: #F4F6F8;
+    --card: #FFFFFF;
+    --line: #D9E1E6;
+    --gray: #5B6670;
+    --gray-light: #8A949C;
+    --green: #2F7A4F;
+    --text: #24313D;
+    --text-soft: #34424D;
+    --field: #EEF3F6;
+    --field-answered: #E4EDF1;
+    --hover: #EEF3F6;
+    --warn-bg: #FCEFD1;
+    --warn-text: #8A5A00;
+    --ok-bg: #DCEFE2;
+    --btn: #1B3A57;
+    --btn-hover: #142A40;
+    --btn-text: #FFFFFF;
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --navy: #A9CBE2;
+    --navy-dark: #8DB6D1;
+    --steel: #7FA6BC;
+    --steel-light: #4A7A96;
+    --red: #E57B70;
+    --red-light: #4A2A27;
+    --bg: #121A22;
+    --card: #1B2631;
+    --line: #2E3C4A;
+    --gray: #A3AEB8;
+    --gray-light: #7D8993;
+    --green: #6FCF97;
+    --text: #E3EAF0;
+    --text-soft: #C3CDD6;
+    --field: #25333F;
+    --field-answered: #2C4252;
+    --hover: #23323F;
+    --warn-bg: #4A3A10;
+    --warn-text: #F2C230;
+    --ok-bg: #1F3D2B;
+    --btn: #4A7A96;
+    --btn-hover: #5C8CA8;
+    --btn-text: #FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Lato', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+
+  #cs-root { min-height: 100vh; padding: 28px 16px 60px; }
+
+  h1, h2, h3, .display {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    margin: 0;
+  }
+
+  .cs-wrap { max-width: 760px; margin: 0 auto; }
+
+  /* ---------- Masthead ---------- */
+  .cs-masthead {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    background: var(--bg);
+    border-bottom: 3px solid var(--navy);
+    padding: 10px 0 14px; margin-bottom: 26px;
+  }
+  .cs-masthead .brand { font-size: 13px; letter-spacing: 0.14em; color: var(--steel); text-transform: uppercase; font-weight: 700; }
+  .cs-masthead h1 { font-size: 38px; color: var(--navy); line-height: 1; }
+
+  .cs-header-tools { display: flex; align-items: flex-end; gap: 14px; }
+  .cs-theme-btn {
+    background: none; border: 1px solid var(--line); border-radius: 4px; cursor: pointer;
+    font-family: 'Lato'; font-size: 12px; font-weight: 700; letter-spacing: 0.04em;
+    color: var(--steel); padding: 5px 10px; white-space: nowrap;
+  }
+  .cs-theme-btn:hover { background: var(--hover); }
+
+  .cs-header-right { text-align: right; }
+  .cs-header-right .cs-progress {
+    font-size: 13px; letter-spacing: 0.06em; color: var(--gray); text-transform: uppercase;
+    font-weight: 700; margin-bottom: 2px;
+  }
+
+  /* ---------- Cards ---------- */
+  .cs-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 28px 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(20,42,64,0.06);
+  }
+
+  p { line-height: 1.55; color: var(--text-soft); }
+
+  /* ---------- Setup screen ---------- */
+  .cs-field { margin-bottom: 18px; }
+  .cs-field label { display: block; font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--steel); margin-bottom: 6px; }
+  .cs-field input[type="text"], .cs-field input[type="number"] {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 4px;
+    font-family: 'Lato'; font-size: 16px; color: var(--text); background: var(--card);
+  }
+  .cs-field input:focus { outline: 2px solid var(--steel-light); outline-offset: 1px; }
+  .cs-field .cs-hint { font-size: 13px; color: var(--gray-light); margin-top: 4px; }
+
+  .cs-instr-list { margin: 0 0 20px; padding-left: 22px; color: var(--text-soft); }
+  .cs-instr-list li { line-height: 1.6; margin-bottom: 10px; font-size: 16px; }
+  .cs-instr-list li:last-child { margin-bottom: 0; }
+
+  .cs-link-btn {
+    background: none; border: none; cursor: pointer; padding: 0;
+    font-family: 'Lato'; font-size: 13px; font-weight: 700; color: var(--steel);
+    text-decoration: underline; margin-top: 10px;
+  }
+  .cs-link-btn:hover { color: var(--navy); }
+
+  .cs-patient-preview {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 4px;
+  }
+  .cs-chip {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+    padding: 5px 12px; font-size: 13px; font-weight: 700; color: var(--navy);
+  }
+
+  .cs-btn {
+    display: inline-block; border: none; border-radius: 4px; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 18px;
+    letter-spacing: 0.03em; padding: 13px 26px; transition: background 0.15s ease;
+  }
+  .cs-btn-primary { background: var(--btn); color: var(--btn-text); }
+  .cs-btn-primary:hover { background: var(--btn-hover); }
+  .cs-btn-primary:disabled { background: var(--gray-light); cursor: not-allowed; }
+  .cs-btn-ghost { background: transparent; color: var(--steel); border: 1px solid var(--steel-light); }
+  .cs-btn-ghost:hover { background: var(--bg); }
+
+
+
+  /* ---------- Patient card ---------- */
+  .cs-patient-head {
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid var(--line); padding-bottom: 14px; margin-bottom: 20px;
+  }
+  .cs-patient-head .cs-pid-label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-light); font-weight: 700; }
+  .cs-patient-head .cs-pid { font-size: 30px; color: var(--navy); }
+
+  .cs-question { margin-bottom: 22px; }
+  .cs-question:last-child { margin-bottom: 0; }
+  .cs-pid-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .cs-copy-btn {
+    background: var(--field); border: 1px solid var(--line); border-radius: 4px; cursor: pointer;
+    font-family: 'Lato'; font-size: 13px; font-weight: 700; color: var(--steel);
+    padding: 6px 12px; min-width: 78px; transition: background 0.15s ease;
+  }
+  .cs-copy-btn:hover { background: var(--hover); border-color: var(--steel-light); }
+  .cs-copy-btn.cs-copied { color: var(--green); border-color: var(--green); }
+
+  .cs-qnum {
+    display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--steel); color: #fff; font-size: 12px; font-weight: 700;
+    text-align: center; line-height: 22px; margin-right: 8px; flex-shrink: 0;
+  }
+  .cs-prompt { font-size: 17px; line-height: 1.7; color: var(--text); }
+  .cs-blank {
+    display: inline-block; min-width: 150px; margin: 0 4px;
+    font-family: 'Lato'; font-size: 15px; font-weight: 700; color: var(--navy);
+    border: none; border-bottom: 2px solid var(--steel); background: var(--field);
+    border-radius: 3px 3px 0 0; padding: 5px 8px; cursor: pointer;
+  }
+  .cs-blank:focus { outline: 2px solid var(--steel-light); outline-offset: 1px; }
+  .cs-blank.cs-answered { background: var(--field-answered); }
+
+  .cs-nav {
+    display: flex; align-items: center; justify-content: space-between; margin-top: 4px;
+  }
+
+  /* ---------- Patient hub ---------- */
+  .cs-hub-list { display: flex; flex-direction: column; gap: 10px; }
+  .cs-hub-row {
+    display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left;
+    background: var(--bg); border: 1px solid var(--line); border-radius: 4px; padding: 14px 16px;
+    cursor: pointer; font-family: 'Lato'; color: var(--text);
+  }
+  .cs-hub-row:hover { border-color: var(--steel-light); background: var(--hover); }
+  .cs-hub-row:focus { outline: 2px solid var(--steel-light); outline-offset: 1px; }
+  .cs-hub-pid { font-weight: 700; color: var(--navy); font-size: 19px; font-family: 'Barlow Condensed'; }
+  .cs-status {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700;
+    padding: 4px 11px; border-radius: 999px; flex-shrink: 0;
+  }
+  .cs-status-not_started { background: var(--line); color: var(--gray); }
+  .cs-status-in_progress { background: var(--warn-bg); color: var(--warn-text); }
+  .cs-status-complete { background: var(--ok-bg); color: var(--green); }
+
+  /* ---------- Results ---------- */
+  .cs-score-hero { text-align: center; padding: 10px 0 6px; }
+  .cs-score-hero .cs-num { font-family: 'Barlow Condensed'; font-weight: 700; font-size: 64px; color: var(--navy); line-height: 1; }
+  .cs-score-hero .cs-of { font-size: 15px; color: var(--gray-light); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+
+  .cs-review-item { border-top: 1px solid var(--line); padding: 14px 0; }
+  .cs-review-item:first-child { border-top: none; }
+  .cs-review-row { display: flex; gap: 10px; align-items: baseline; font-size: 15px; margin-bottom: 4px; }
+  .cs-mark { font-weight: 700; font-size: 13px; flex-shrink: 0; width: 62px; }
+  .cs-mark.cs-correct { color: var(--green); }
+  .cs-mark.cs-incorrect { color: var(--red); }
+  .cs-review-answer { color: var(--gray); font-size: 14px; margin-left: 72px; }
+
+  .cs-leader-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .cs-leader-row:last-child { border-bottom: none; }
+  .cs-leader-row .cs-lname { font-weight: 700; color: var(--navy); }
+
+  .cs-actions { display: flex; gap: 12px; margin-top: 18px; }
+
+  .cs-footer-note { font-size: 13px; color: var(--gray-light); text-align: center; margin-top: 10px; }
+
+  @media (max-width: 480px) {
+    .cs-card { padding: 20px 18px; }
+    .cs-masthead h1 { font-size: 30px; }
+    .cs-patient-head .cs-pid { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+<div id="cs-root">
+  <div class="cs-wrap">
+    <div class="cs-masthead">
+      <div>
+        <div class="brand">Pivotal Health &middot; CCT Training</div>
+        <h1>Chart Sprint</h1>
+      </div>
+      <div class="cs-header-tools">
+        <div class="cs-header-right" id="cs-header-right"></div>
+        <button class="cs-theme-btn" id="cs-theme-btn" type="button"></button>
+      </div>
+    </div>
+    <div id="cs-app"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DB_PATH = "patients_db.csv";
+  var TEMPLATES_PATH = "question_templates.csv";
+  var QUESTIONS_PER_PATIENT = 5;
+  var PATIENTS_PER_SPRINT = 10; // how many patients get pulled into a single sprint
+
+  // Fallback data used only if the CSVs can't be fetched (e.g. opened as a local file).
+  var FALLBACK_DB_CSV =
+"patient,max HR,min HR,avg HR,rhythm,IVCD?,AVB?,PSVC count,PVC count,# of morph,SV couplet,ven couplet,v bigeminy,v trigeminy,pt marker count,VT,SVT,misc\n" +
+"wMkAE5lD,69,41,48,sinus,no,no,16,2,,,,,,,,,\n" +
+"wOG2lYVw,127,52,74,sinus,no,no,60,2,2,1,,,,,,,\n" +
+"DY0zQ0Vx,138,48,48,sinus,no,no,8,103,2,,,,,,,,\n" +
+"wpKj3RBo,95,52,63,sinus,no,no,23,8,2,,,,,,,,\n" +
+"oNLVbpgx,128,57,71,sinus,no,no,6,1,,,,,,,,,\n" +
+"wVQ1lJno,141,57,87,sinus,no,no,10,109,,,,,,,,,signal loss day 1 1423-1517\n" +
+"w3LeJJKx,127,54,75,sinus,no,no,14,0,,,,,,,,,\n" +
+"xbnRjnPx,129,52,72,sinus,no,no,38,112,2,1,,,,,,,\n" +
+"o7yl9M3x,138,54,88,sinus,no,no,0,0,,,,,,,,,signal loss day 2 0717 to approx 1100\n" +
+"DPmLNp6o,105,62,74,sinus,no,no,28,47,,,1,2,,,,1,SV triplet\n";
+
+  // "tier" controls question selection: core (always asked, in file order — max HR,
+  // min HR, avg HR, rhythm) plus one "how many" question from count_pick (the first
+  // field in file order that has a value — PSVC, PVC, SVT, VT, couplets, etc.).
+  // count_pick rows share one prompt with a {label} placeholder. "extra" rows are
+  // never auto-selected (kept here for reference / manual use elsewhere).
+  var FALLBACK_TEMPLATES_CSV =
+"field_key,prompt,type,tier,label\n" +
+"max_hr,What was the maximum HR? ___,numeric_hr,core,\n" +
+"min_hr,What was the minimum HR? ___,numeric_hr,core,\n" +
+"avg_hr,What was the average HR? ___,numeric_hr,core,\n" +
+"rhythm,What was the underlying rhythm? ___,categorical,core,\n" +
+"psvc_count,How many {label} were there? ___,numeric_count,count_pick,PSVCs\n" +
+"pvc_count,How many {label} were there? ___,numeric_count,count_pick,PVCs\n" +
+"svt,How many {label} were there? ___,numeric_count,count_pick,SVTs\n" +
+"vt,How many {label} were there? ___,numeric_count,count_pick,VTs\n" +
+"sv_couplet,How many {label} were there? ___,numeric_count,count_pick,SV couplets\n" +
+"ven_couplet,How many {label} were there? ___,numeric_count,count_pick,ventricular couplets\n" +
+"v_bigeminy,How many {label} were there? ___,numeric_count,count_pick,instances of v bigeminy\n" +
+"v_trigeminy,How many {label} were there? ___,numeric_count,count_pick,instances of v trigeminy\n" +
+"of_morph,How many {label} were there? ___,numeric_count,count_pick,PVC morphologies\n" +
+"pt_marker_count,How many {label} were there? ___,numeric_count,count_pick,patient markers\n" +
+"ivcd,Was IVCD present in this study? ___,yesno,extra,\n" +
+"avb,Was AVB present in this study? ___,yesno,extra,\n";
+
+  var LEADERBOARD_KEY = "cs_chartsprint_leaderboard";
+  var PROGRESS_KEY = "cs_chartsprint_progress";
+  var RHYTHM_VOCAB = ["Sinus Rhythm", "Atrial Fibrillation", "Sinus Bradycardia", "Sinus Tachycardia", "Supraventricular Tachycardia (SVT)"];
+  var RHYTHM_MAP = { "sinus": "Sinus Rhythm", "afib": "Atrial Fibrillation", "atrial fibrillation": "Atrial Fibrillation", "svt": "Supraventricular Tachycardia (SVT)" };
+
+  function parseCSV(text) {
+    var lines = text.replace(/\r/g, "").split("\n").filter(function (l) { return l.trim().length; });
+    var headers = splitCSVLine(lines[0]);
+    var rows = [];
+    for (var i = 1; i < lines.length; i++) {
+      var cells = splitCSVLine(lines[i]);
+      var row = {};
+      headers.forEach(function (h, idx) { row[h.trim()] = (cells[idx] || "").trim(); });
+      rows.push(row);
+    }
+    return rows;
+  }
+
+  function splitCSVLine(line) {
+    var result = [], cur = "", inQuotes = false;
+    for (var i = 0; i < line.length; i++) {
+      var c = line[i];
+      if (c === '"') { inQuotes = !inQuotes; }
+      else if (c === "," && !inQuotes) { result.push(cur); cur = ""; }
+      else { cur += c; }
+    }
+    result.push(cur);
+    return result;
+  }
+
+  // Turns a patients_db.csv header ("# of morph", "v bigeminy") into a field_key ("of_morph", "v_bigeminy")
+  function normalizeKey(h) {
+    return h.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  }
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+  // ---------------- Distractor generation ----------------
+
+  function hrDistractors(correct) {
+    var n = Number(correct);
+    var out = [], tries = 0;
+    while (out.length < 3 && tries < 40) {
+      tries++;
+      var offset = randInt(8, 25) * (Math.random() < 0.5 ? -1 : 1);
+      var val = n + offset;
+      if (val > 0 && val !== n && out.indexOf(val) === -1) out.push(val);
+    }
+    return out.map(String);
+  }
+
+  function countDistractors(correct) {
+    var n = Number(correct);
+    var out = [], tries = 0;
+    if (n === 0) {
+      var pool = shuffle([3, 8, 15, 25, 40, 60, 90]);
+      return pool.slice(0, 3).map(String);
+    }
+    var multipliers = shuffle([0.25, 0.5, 1.6, 2.2, 3]);
+    while (out.length < 3 && tries < multipliers.length) {
+      var val = Math.round(n * multipliers[tries]);
+      tries++;
+      if (val >= 0 && val !== n && out.indexOf(val) === -1) out.push(val);
+    }
+    // top up if rounding collisions left us short
+    var guard = 0;
+    while (out.length < 3 && guard < 20) {
+      guard++;
+      var val2 = Math.max(0, n + randInt(-n, n + 10) + guard);
+      if (val2 !== n && out.indexOf(val2) === -1) out.push(val2);
+    }
+    return out.map(String);
+  }
+
+  function rhythmDisplay(raw) {
+    var key = (raw || "").trim().toLowerCase();
+    return RHYTHM_MAP[key] || (raw.charAt(0).toUpperCase() + raw.slice(1));
+  }
+
+  function rhythmDistractors(correctDisplay) {
+    return shuffle(RHYTHM_VOCAB.filter(function (r) { return r !== correctDisplay; })).slice(0, 3);
+  }
+
+  // Builds one question's {prompt, options[], correct letter} from a template + raw DB value.
+  function buildQuestion(template, rawValue) {
+    var correctDisplay, distractors;
+    if (template.type === "numeric_hr") {
+      correctDisplay = String(Number(rawValue));
+      distractors = hrDistractors(rawValue);
+    } else if (template.type === "numeric_count") {
+      correctDisplay = String(Number(rawValue));
+      distractors = countDistractors(rawValue);
+    } else if (template.type === "categorical") {
+      correctDisplay = rhythmDisplay(rawValue);
+      distractors = rhythmDistractors(correctDisplay);
+    } else if (template.type === "yesno") {
+      correctDisplay = /^y/i.test(rawValue) ? "Yes" : "No";
+      distractors = [correctDisplay === "Yes" ? "No" : "Yes"];
+    } else {
+      return null;
+    }
+
+    var options = shuffle([correctDisplay].concat(distractors));
+    var correctLetter = optionLetter(options.indexOf(correctDisplay));
+    var prompt = template.label ? template.prompt.replace("{label}", template.label) : template.prompt;
+    return { prompt: prompt, options: options, correct: correctLetter };
+  }
+
+  var TIER_ORDER = { core: 0, count_pick: 1 }; // "extra" tier rows are never auto-selected
+
+  function buildPatientsFromDB(dbRows, templateRows) {
+    var templates = templateRows
+      .map(function (t, i) {
+        return { field_key: t.field_key, prompt: t.prompt, type: t.type, tier: t.tier, label: t.label, fileOrder: i };
+      })
+      .filter(function (t) { return TIER_ORDER.hasOwnProperty(t.tier); })
+      .sort(function (a, b) {
+        return TIER_ORDER[a.tier] - TIER_ORDER[b.tier] || a.fileOrder - b.fileOrder;
+      });
+
+    return dbRows.map(function (row) {
+      var normalized = {};
+      Object.keys(row).forEach(function (h) {
+        if (h.toLowerCase() === "patient") return;
+        normalized[normalizeKey(h)] = row[h];
+      });
+
+      // Optional "focus" column: names the count to ask about instead of the default
+      // (e.g. "PVC count"). If that field is blank for the patient, the normal order applies.
+      var ordered = templates.slice();
+      var focusKey = normalized.focus ? normalizeKey(normalized.focus) : "";
+      if (focusKey) {
+        var fi = -1;
+        for (var k = 0; k < ordered.length; k++) {
+          if (ordered[k].field_key === focusKey && ordered[k].tier === "count_pick") { fi = k; break; }
+        }
+        if (fi > -1) {
+          var focusT = ordered.splice(fi, 1)[0];
+          var firstCount = -1;
+          for (var m = 0; m < ordered.length; m++) { if (ordered[m].tier === "count_pick") { firstCount = m; break; } }
+          ordered.splice(firstCount > -1 ? firstCount : ordered.length, 0, focusT);
+        }
+      }
+
+      var questions = [];
+      for (var i = 0; i < ordered.length && questions.length < QUESTIONS_PER_PATIENT; i++) {
+        var t = ordered[i];
+        var raw = normalized[t.field_key];
+        if (raw === undefined || raw === null || String(raw).trim() === "") continue;
+        var q = buildQuestion(t, raw);
+        if (q) { q.num = questions.length + 1; questions.push(q); }
+      }
+
+      return { id: row.patient, label: row.patient, questions: questions };
+    }).filter(function (p) { return p.questions.length > 0; });
+  }
+
+  // ---------------- App state ----------------
+  var state = {
+    allPatients: [],    // full training database
+    patients: [],       // this sprint's random subset of allPatients
+    name: "",
+    answers: {},        // "patientId__qnum" -> selected option letter
+    finished: false
+  };
+
+  function pickSprintPatients() {
+    return shuffle(state.allPatients).slice(0, Math.min(PATIENTS_PER_SPRINT, state.allPatients.length));
+  }
+
+  var app = document.getElementById("cs-app");
+
+  function optionLetter(idx) { return ["a", "b", "c", "d"][idx]; }
+
+  // ---------------- Progress autosave ----------------
+  function saveProgress() {
+    try {
+      var patientIds = state.patients.map(function (p) { return p.id; });
+      localStorage.setItem(PROGRESS_KEY, JSON.stringify({ name: state.name, patientIds: patientIds, answers: state.answers, savedAt: Date.now() }));
+    } catch (e) {}
+  }
+  function loadProgress() {
+    try {
+      var raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+  function clearProgress() {
+    try { localStorage.removeItem(PROGRESS_KEY); } catch (e) {}
+  }
+
+  function patientStatus(p) {
+    var answered = p.questions.filter(function (q) { return state.answers[p.id + "__" + q.num]; }).length;
+    if (answered === 0) return "not_started";
+    if (answered === p.questions.length) return "complete";
+    return "in_progress";
+  }
+
+  function overallSummary() {
+    var complete = state.patients.filter(function (p) { return patientStatus(p) === "complete"; }).length;
+    return { complete: complete, total: state.patients.length };
+  }
+
+  // ---------------- Screens ----------------
+
+  function setHeaderRight(html) {
+    document.getElementById("cs-header-right").innerHTML = html;
+  }
+
+  function renderInstructions() {
+    setHeaderRight("");
+    app.innerHTML =
+      '<div class="cs-card">' +
+        '<h2 style="font-size:24px;color:var(--navy);margin-bottom:14px;">How it works</h2>' +
+        '<ol class="cs-instr-list">' +
+          '<li>Pick any patient from the list and look up their record in the training database (Cardiologs), just like you would during normal scanning.</li>' +
+          '<li>Answer the 5 fill-in-the-blank questions on the page using the dropdowns &mdash; everything you need is in that patient\'s chart.</li>' +
+          '<li>No timer, and no set order. Work through patients in any order, alongside your normal scanning.</li>' +
+          '<li>Your answers save automatically on this device &mdash; close the tab anytime and pick back up later.</li>' +
+          '<li>Click <strong>Submit Sprint</strong> from the patient list whenever you\'re ready to see your score and a full review.</li>' +
+        '</ol>' +
+        '<button class="cs-btn cs-btn-primary" id="cs-instr-continue">Continue</button>' +
+      '</div>';
+
+    document.getElementById("cs-instr-continue").addEventListener("click", renderSetup);
+  }
+
+  function renderSetup() {
+    setHeaderRight("");
+    var sprintSize = Math.min(PATIENTS_PER_SPRINT, state.allPatients.length);
+
+    app.innerHTML =
+      '<div class="cs-card">' +
+        '<h2 style="font-size:24px;color:var(--navy);margin-bottom:10px;">Before you start</h2>' +
+        '<p>Each sprint pulls ' + sprintSize + ' random patients from the training database (' +
+        state.allPatients.length + ' total right now). Look each one up in Cardiologs and answer their ' +
+        QUESTIONS_PER_PATIENT + ' fill-in-the-blank questions, all on one page. ' +
+        'No timer &mdash; work through them alongside your normal scanning, in any order.</p>' +
+        '<p class="cs-footer-note" style="text-align:left;margin-top:6px;">Which ' + sprintSize + ' patients you get is picked fresh each time you start.</p>' +
+      '</div>' +
+      '<div class="cs-card">' +
+        '<div class="cs-field">' +
+          '<label for="cs-name">Your name</label>' +
+          '<input type="text" id="cs-name" placeholder="e.g. Jordan T.">' +
+        '</div>' +
+        '<button class="cs-btn cs-btn-primary" id="cs-start-btn">Start Sprint</button>' +
+        '<div><button class="cs-link-btn" id="cs-view-instr">View instructions again</button></div>' +
+      '</div>';
+
+    document.getElementById("cs-start-btn").addEventListener("click", function () {
+      var nameVal = document.getElementById("cs-name").value.trim();
+      state.name = nameVal || "Anonymous";
+      state.patients = pickSprintPatients();
+      state.answers = {};
+      state.finished = false;
+      saveProgress();
+      renderHub();
+    });
+    document.getElementById("cs-view-instr").addEventListener("click", renderInstructions);
+  }
+
+  function renderHub(opts) {
+    opts = opts || {};
+    var summary = overallSummary();
+    setHeaderRight('<div class="cs-progress">' + summary.complete + ' of ' + summary.total + ' patients complete</div>');
+
+    var rows = state.patients.map(function (p, i) {
+      var status = patientStatus(p);
+      var statusLabel = status === "complete" ? "Complete" : status === "in_progress" ? "In progress" : "Not started";
+      return (
+        '<button class="cs-hub-row" data-idx="' + i + '">' +
+          '<span class="cs-hub-pid">' + escapeHtml(p.label) + '</span>' +
+          '<span class="cs-status cs-status-' + status + '">' + statusLabel + '</span>' +
+        '</button>'
+      );
+    }).join("");
+
+    var resumeBanner = opts.resumed
+      ? '<p class="cs-footer-note" style="text-align:left;margin-bottom:14px;">Welcome back' + (state.name ? ", " + escapeHtml(state.name) : "") +
+        ' &mdash; picking up where you left off. <button class="cs-link-btn" id="cs-fresh-btn" style="margin:0 0 0 4px;">Start a new sprint instead</button></p>'
+      : "";
+
+    app.innerHTML =
+      '<div class="cs-card">' +
+        resumeBanner +
+        '<div class="cs-hub-list">' + rows + '</div>' +
+      '</div>' +
+      '<div class="cs-card" style="padding:16px 30px;">' +
+        '<div class="cs-nav" style="justify-content:flex-end;">' +
+          '<button class="cs-btn cs-btn-primary" id="cs-submit-btn">Submit Sprint</button>' +
+        '</div>' +
+      '</div>';
+
+    app.querySelectorAll(".cs-hub-row").forEach(function (btn) {
+      btn.addEventListener("click", function () { renderPatientDetail(Number(btn.getAttribute("data-idx"))); });
+    });
+
+    var freshBtn = document.getElementById("cs-fresh-btn");
+    if (freshBtn) freshBtn.addEventListener("click", function () {
+      clearProgress();
+      state.name = "";
+      state.answers = {};
+      renderSetup();
+    });
+
+    document.getElementById("cs-submit-btn").addEventListener("click", function () {
+      var s = overallSummary();
+      if (s.complete < s.total) {
+        var ok = window.confirm((s.total - s.complete) + " patient(s) aren\u2019t finished yet. Submit anyway?");
+        if (!ok) return;
+      }
+      finishSprint();
+    });
+  }
+
+  function renderPatientDetail(idx) {
+    var p = state.patients[idx];
+    var summary = overallSummary();
+    setHeaderRight('<div class="cs-progress">' + summary.complete + ' of ' + summary.total + ' patients complete</div>');
+
+    var qHtml = p.questions.map(function (q) {
+      var key = p.id + "__" + q.num;
+      var selected = state.answers[key] || "";
+      var opts = q.options.map(function (opt, i) {
+        var letter = optionLetter(i);
+        var sel = selected === letter ? " selected" : "";
+        return '<option value="' + letter + '"' + sel + '>' + escapeHtml(opt) + '</option>';
+      }).join("");
+      var promptHtml = escapeHtml(q.prompt).replace(
+        "___",
+        '<select class="cs-blank' + (selected ? " cs-answered" : "") + '" data-key="' + key + '">' +
+          '<option value="">&mdash; select &mdash;</option>' + opts +
+        '</select>'
+      );
+      return (
+        '<div class="cs-question">' +
+          '<span class="cs-prompt"><span class="cs-qnum">' + q.num + '</span>' + promptHtml + '</span>' +
+        '</div>'
+      );
+    }).join("");
+
+    app.innerHTML =
+      '<div class="cs-card">' +
+        '<div class="cs-patient-head">' +
+          '<div><div class="cs-pid-label">Look up</div><div class="cs-pid-row"><div class="cs-pid">' + escapeHtml(p.label) + '</div>' +
+            '<button class="cs-copy-btn" id="cs-copy-btn" type="button">Copy</button></div></div>' +
+        '</div>' +
+        qHtml +
+      '</div>' +
+      '<div class="cs-card" style="padding:16px 30px;">' +
+        '<div class="cs-nav" style="justify-content:flex-start;">' +
+          '<button class="cs-btn cs-btn-ghost" id="cs-back-btn">&larr; Back to patient list</button>' +
+        '</div>' +
+      '</div>';
+
+    app.querySelectorAll(".cs-blank").forEach(function (sel) {
+      sel.addEventListener("change", function () {
+        state.answers[sel.getAttribute("data-key")] = sel.value;
+        sel.classList.toggle("cs-answered", !!sel.value);
+        saveProgress();
+      });
+    });
+
+    var copyBtn = document.getElementById("cs-copy-btn");
+    copyBtn.addEventListener("click", function () {
+      copyText(p.label, function (ok) {
+        copyBtn.textContent = ok ? "Copied \u2713" : "Press Ctrl+C";
+        copyBtn.classList.toggle("cs-copied", ok);
+        setTimeout(function () { copyBtn.textContent = "Copy"; copyBtn.classList.remove("cs-copied"); }, 1600);
+      });
+    });
+
+    document.getElementById("cs-back-btn").addEventListener("click", function () { renderHub(); });
+  }
+
+  function copyText(text, done) {
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "");
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = document.execCommand("copy"); } catch (e) {}
+      document.body.removeChild(ta);
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  // ---------------- Theme toggle ----------------
+  function applyThemeButton() {
+    var dark = document.documentElement.getAttribute("data-theme") === "dark";
+    var btn = document.getElementById("cs-theme-btn");
+    btn.textContent = dark ? "\u2600 Light" : "\u263E Dark";
+    btn.setAttribute("aria-label", dark ? "Switch to light mode" : "Switch to dark mode");
+  }
+  function initTheme() {
+    applyThemeButton();
+    document.getElementById("cs-theme-btn").addEventListener("click", function () {
+      var next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      try { localStorage.setItem("cs_theme", next); } catch (e) {}
+      applyThemeButton();
+    });
+  }
+
+  function finishSprint() {
+    if (state.finished) return;
+    state.finished = true;
+
+    var correctCount = 0, totalCount = 0, review = [];
+    state.patients.forEach(function (p) {
+      p.questions.forEach(function (q) {
+        totalCount++;
+        var key = p.id + "__" + q.num;
+        var given = state.answers[key] || "";
+        var isCorrect = given === q.correct;
+        if (isCorrect) correctCount++;
+        var correctIdx = ["a", "b", "c", "d"].indexOf(q.correct);
+        var correctText = q.options[correctIdx] || "?";
+        var givenIdx = ["a", "b", "c", "d"].indexOf(given);
+        var givenText = given ? (q.options[givenIdx] || "?") : "(no answer)";
+        review.push({ patientLabel: p.label, prompt: q.prompt, isCorrect: isCorrect, correctText: correctText, givenText: givenText });
+      });
+    });
+
+    saveScore(state.name, correctCount, totalCount);
+    clearProgress();
+    renderResults(correctCount, totalCount, review);
+  }
+
+  function saveScore(name, correct, total) {
+    var board = [];
+    try { board = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]"); } catch (e) { board = []; }
+    board.push({ name: name, correct: correct, total: total, ts: Date.now() });
+    board.sort(function (a, b) { return (b.correct / b.total) - (a.correct / a.total) || a.ts - b.ts; });
+    board = board.slice(0, 15);
+    try { localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(board)); } catch (e) {}
+  }
+
+  function renderResults(correct, total, review) {
+    setHeaderRight("");
+    var board = [];
+    try { board = JSON.parse(localStorage.getItem(LEADERBOARD_KEY) || "[]"); } catch (e) { board = []; }
+
+    var reviewHtml = review.map(function (r) {
+      return (
+        '<div class="cs-review-item">' +
+          '<div class="cs-review-row">' +
+            '<span class="cs-mark ' + (r.isCorrect ? "cs-correct" : "cs-incorrect") + '">' + (r.isCorrect ? "CORRECT" : "MISSED") + '</span>' +
+            '<span><strong>' + escapeHtml(r.patientLabel) + ':</strong> ' + escapeHtml(r.prompt.replace("___", "____")) + '</span>' +
+          '</div>' +
+          '<div class="cs-review-answer">' +
+            (r.isCorrect ? ("Answered: " + escapeHtml(r.givenText)) : ("Correct answer: " + escapeHtml(r.correctText) + " &nbsp;&middot;&nbsp; You answered: " + escapeHtml(r.givenText))) +
+          '</div>' +
+        '</div>'
+      );
+    }).join("");
+
+    var leaderHtml = board.length ? board.map(function (b, i) {
+      var pct = Math.round((b.correct / b.total) * 100);
+      return (
+        '<div class="cs-leader-row">' +
+          '<span>' + (i + 1) + '. <span class="cs-lname">' + escapeHtml(b.name) + '</span></span>' +
+          '<span>' + b.correct + '/' + b.total + ' (' + pct + '%)</span>' +
+        '</div>'
+      );
+    }).join("") : '<p class="cs-hint">No scores yet on this device.</p>';
+
+    app.innerHTML =
+      '<div class="cs-card">' +
+        '<div class="cs-score-hero">' +
+          '<div class="cs-num">' + correct + '/' + total + '</div>' +
+          '<div class="cs-of">' + Math.round((correct / total) * 100) + '% correct</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="cs-card">' +
+        '<h2 style="font-size:22px;color:var(--navy);margin-bottom:8px;">Review</h2>' +
+        reviewHtml +
+      '</div>' +
+      '<div class="cs-card">' +
+        '<h2 style="font-size:22px;color:var(--navy);margin-bottom:8px;">Leaderboard &middot; this device</h2>' +
+        leaderHtml +
+      '</div>' +
+      '<div class="cs-actions">' +
+        '<button class="cs-btn cs-btn-primary" id="cs-restart-btn">Run Another Sprint</button>' +
+      '</div>' +
+      '<p class="cs-footer-note">Leaderboard is stored locally in this browser, not shared across devices.</p>';
+
+    document.getElementById("cs-restart-btn").addEventListener("click", function () {
+      state.answers = {};
+      state.finished = false;
+      renderSetup();
+    });
+  }
+
+  function escapeHtml(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  // ---------------- Boot ----------------
+  function init(dbText, templatesText) {
+    var dbRows = parseCSV(dbText);
+    var templateRows = parseCSV(templatesText);
+    state.allPatients = buildPatientsFromDB(dbRows, templateRows);
+
+    var saved = loadProgress();
+    if (saved && saved.answers && Object.keys(saved.answers).length && saved.patientIds && saved.patientIds.length) {
+      var byId = {};
+      state.allPatients.forEach(function (p) { byId[p.id] = p; });
+      var restored = saved.patientIds.map(function (id) { return byId[id]; }).filter(Boolean);
+      if (restored.length) {
+        state.name = saved.name || "";
+        state.patients = restored;
+        state.answers = saved.answers;
+        state.finished = false;
+        renderHub({ resumed: true });
+        return;
+      }
+    }
+    renderInstructions();
+  }
+
+  function fetchText(path) {
+    return fetch(path, { cache: "no-store" }).then(function (res) {
+      if (!res.ok) throw new Error("fetch failed: " + path);
+      return res.text();
+    });
+  }
+
+  initTheme();
+
+  Promise.all([fetchText(DB_PATH), fetchText(TEMPLATES_PATH)])
+    .then(function (results) { init(results[0], results[1]); })
+    .catch(function () { init(FALLBACK_DB_CSV, FALLBACK_TEMPLATES_CSV); });
+})();
+</script>
+</body>
+</html>
